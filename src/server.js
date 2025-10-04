@@ -4,7 +4,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import { getEnvVariables } from './utils/getEnvVariables.js';
-import { getAllTasks, getTaskById } from './services/todoTasks.js';
+
+import tasksRouter from './routers/students.js';
+import { error404Handler } from './middlewares/Error404Handler.js';
+import { error500Handler } from './middlewares/Error500Handler.js';
 
 dotenv.config();
 
@@ -26,41 +29,13 @@ export const startServer = () => {
 
   app.use(express.json());
 
-  app.get('/tasks', async (req, res) => {
-    const tasks = await getAllTasks();
-
-    res.status(200).json({
-      data: tasks,
-    });
-  });
-
-  app.get('/tasks/:taskId', async (req, res, next) => {
-    const { taskId } = req.params;
-    const task = await getTaskById(taskId);
-
-    if (!task) {
-      res.status(404).json({
-        message: 'Task not found',
-      });
-      return;
-    }
-
-    res.status(200).json({
-      data: task,
-    });
-  });
+  app.use(tasksRouter);
 
   //ERROR 404
-  app.use((req, res, next) => {
-    res.status(404).json({
-      message: 'Route Not found',
-    });
-  });
+  app.use(error404Handler);
 
   //ERROR 500
-  app.use((err, req, res, next) => {
-    res.status(500).json({ message: 'Something went wrong!' });
-  });
+  app.use(error500Handler);
 
   app.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);

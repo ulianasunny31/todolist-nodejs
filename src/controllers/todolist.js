@@ -3,12 +3,18 @@ import {
   deleteTask,
   getAllTasks,
   getTaskById,
-} from '../services/todoTasks.js';
+  updateTask,
+} from '../services/todolist.js';
 
 import createHttpError from 'http-errors';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 export const getAllTasksController = async (req, res) => {
-  const tasks = await getAllTasks();
+  const { page, perPage } = parsePaginationParams(req.query);
+  const tasks = await getAllTasks({
+    page,
+    perPage,
+  });
 
   res.status(200).json({
     status: 200,

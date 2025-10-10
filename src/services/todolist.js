@@ -1,7 +1,14 @@
+import { SORT_ORDER } from '../constants/index.js';
 import { TodoTaskCollection } from '../db/models/TodoTask.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-export const getAllTasks = async ({ page, perPage }) => {
+export const getAllTasks = async ({
+  page,
+  perPage,
+  sortBy = 'title',
+  sortOrder = SORT_ORDER.ASC,
+}) => {
+  //pagination logic
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
@@ -10,7 +17,11 @@ export const getAllTasks = async ({ page, perPage }) => {
     .merge(tasksQuery)
     .countDocuments();
 
-  const tasks = await tasksQuery.skip(skip).limit(limit).exec();
+  const tasks = await tasksQuery
+    .skip(skip)
+    .limit(limit)
+    .sort({ [sortBy]: sortOrder })
+    .exec();
 
   const paginationData = calculatePaginationData(tasksCount, page, perPage);
 

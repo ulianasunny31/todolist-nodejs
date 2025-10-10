@@ -6,13 +6,13 @@ export const getAllTasks = async ({ page, perPage }) => {
   const skip = (page - 1) * perPage;
 
   const tasksQuery = TodoTaskCollection.find();
-  const taskscount = await TodoTaskCollection.find()
+  const tasksCount = await TodoTaskCollection.find()
     .merge(tasksQuery)
     .countDocuments();
 
   const tasks = await tasksQuery.skip(skip).limit(limit).exec();
 
-  const paginationData = calculatePaginationData(taskscount, page, perPage);
+  const paginationData = calculatePaginationData(tasksCount, page, perPage);
 
   return {
     tasks,

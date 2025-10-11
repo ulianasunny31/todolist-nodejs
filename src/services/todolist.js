@@ -7,21 +7,32 @@ export const getAllTasks = async ({
   perPage,
   sortBy = 'title',
   sortOrder = SORT_ORDER.ASC,
+  filter = {},
 }) => {
   //pagination logic
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
   const tasksQuery = TodoTaskCollection.find();
-  const tasksCount = await TodoTaskCollection.find()
-    .merge(tasksQuery)
-    .countDocuments();
 
-  const tasks = await tasksQuery
-    .skip(skip)
-    .limit(limit)
-    .sort({ [sortBy]: sortOrder })
-    .exec();
+  //filtering logic
+  if (filter.completed) {
+    tasksQuery.where('completed').equals(filter.completed);
+  }
+
+  if (filter.in_progress) {
+    tasksQuery.where('in_progress').equals(filter.in_progress);
+  }
+
+  //pagination logic + sorting
+  const [tasksCount, tasks] = await Promise.all([
+    TodoTaskCollection.find().merge(tasksQuery).countDocuments(),
+    tasksQuery
+      .skip(skip)
+      .limit(limit)
+      .sort({ [sortBy]: sortOrder })
+      .exec(),
+  ]);
 
   const paginationData = calculatePaginationData(tasksCount, page, perPage);
 

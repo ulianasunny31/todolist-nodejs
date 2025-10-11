@@ -14,12 +14,13 @@ import { validateID } from '../middlewares/validateID.js';
 
 const router = Router();
 
-router.get('/tasks', ctrlWrapper(getAllTasksController));
+router.get('/', ctrlWrapper(getAllTasksController));
 
-router.get('/tasks/:taskId', validateID, ctrlWrapper(getTaskByIdController));
+router.get('/:taskId', validateID, ctrlWrapper(getTaskByIdController));
 
 router.patch(
-  '/tasks/:taskId',
+  '/:taskId',
+  validateID,
   validate(updateTaskSchema),
   ctrlWrapper(updateTaskController),
 );
@@ -30,6 +31,6 @@ router.post(
   ctrlWrapper(createTaskController),
 );
 
-router.delete('/tasks/:taskId', ctrlWrapper(deleteTaskController));
+router.delete('/:taskId', validateID, ctrlWrapper(deleteTaskController));
 
 export default router;

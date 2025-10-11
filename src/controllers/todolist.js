@@ -13,12 +13,14 @@ import { parseSortParams } from '../utils/parseSortParams.js';
 export const getAllTasksController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
+  const filter = req.query;
 
   const tasks = await getAllTasks({
     page,
     perPage,
     sortBy,
     sortOrder,
+    filter,
   });
 
   res.status(200).json({

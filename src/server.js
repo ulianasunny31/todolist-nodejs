@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 import { getEnvVariables } from './utils/getEnvVariables.js';
 
-import tasksRouter from './routers/todolist.js';
+import router from './routers/index.js';
 import { error404Handler } from './middlewares/Error404Handler.js';
 import { error500Handler } from './middlewares/Error500Handler.js';
 
@@ -29,7 +29,7 @@ export const startServer = () => {
 
   app.use(express.json());
 
-  app.use(tasksRouter);
+  app.use(router);
 
   //ERROR 404
   app.use(error404Handler);

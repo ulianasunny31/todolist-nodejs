@@ -2,16 +2,29 @@ import { Router } from 'express';
 import { validate } from '../middlewares/validate.js';
 import {
   loginUserController,
+  logoutUserController,
   registerUserController,
 } from '../controllers/authorization.js';
 import {
   loginUserSchema,
   registerUserSchema,
 } from '../validation/authorization.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 
 const router = Router();
 
-router.get('/register', validate(registerUserSchema), registerUserController);
-router.get('/login', validate(loginUserSchema), loginUserController);
+router.post(
+  '/register',
+  validate(registerUserSchema),
+  ctrlWrapper(registerUserController),
+);
+
+router.post(
+  '/login',
+  validate(loginUserSchema),
+  ctrlWrapper(loginUserController),
+);
+
+router.post('/logout', ctrlWrapper(logoutUserController));
 
 export default router;

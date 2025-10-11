@@ -8,6 +8,7 @@ import { getEnvVariables } from './utils/getEnvVariables.js';
 import router from './routers/index.js';
 import { error404Handler } from './middlewares/Error404Handler.js';
 import { error500Handler } from './middlewares/Error500Handler.js';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -18,14 +19,16 @@ const PORT = Number(getEnvVariables('PORT', 3000));
 export const startServer = () => {
   app.use(cors());
 
+  app.use(cookieParser());
+
   //PINO-PRETTY
-  //   app.use(
-  //     pino({
-  //       transport: {
-  //         target: 'pino-pretty',
-  //       },
-  //     }),
-  //   );
+  // app.use(
+  //   pino({
+  //     transport: {
+  //       target: 'pino-pretty',
+  //     },
+  //   }),
+  // );
 
   app.use(express.json());
 

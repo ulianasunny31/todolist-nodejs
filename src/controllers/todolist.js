@@ -21,6 +21,7 @@ export const getAllTasksController = async (req, res) => {
     sortBy,
     sortOrder,
     filter,
+    userId: req.user._id,
   });
 
   res.status(200).json({
@@ -32,7 +33,8 @@ export const getAllTasksController = async (req, res) => {
 
 export const getTaskByIdController = async (req, res, next) => {
   const { taskId } = req.params;
-  const task = await getTaskById(taskId);
+  const { userId } = req.user._id;
+  const task = await getTaskById(taskId, userId);
 
   if (!task) {
     throw createHttpError(404, 'Task not found');
@@ -46,17 +48,20 @@ export const getTaskByIdController = async (req, res, next) => {
 };
 
 export const createTaskController = async (req, res) => {
-  const task = await createTask(req.body);
+  const task = { ...req.body, userId: req.user._id };
+  const result = await createTask(task);
 
   res.status(201).json({
     status: 201,
     message: 'Task created successfully',
-    data: task,
+    data: result,
   });
 };
 
 export const deleteTaskController = async (req, res, next) => {
-  const task = await deleteTask(req.params);
+  const taskId = req.params;
+  const userId = req.user._id;
+  const task = await deleteTask(taskId, userId);
 
   if (!task) {
     next(createHttpError(404, 'Task not found'));
@@ -71,7 +76,9 @@ export const deleteTaskController = async (req, res, next) => {
 
 //patch
 export const updateTaskController = async (req, res, next) => {
-  const result = await updateTask(req.params, req.body);
+  const taskId = req.params;
+  const userId = req.user._id;
+  const result = await updateTask({ taskId, userId, payload: req.body });
 
   if (!result) {
     next(createHttpError(404, 'Task not found'));

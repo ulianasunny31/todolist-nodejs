@@ -11,8 +11,11 @@ import {
 import { createTaskSchema, updateTaskSchema } from '../validation/todolist.js';
 import { validate } from '../middlewares/validate.js';
 import { validateID } from '../middlewares/validateID.js';
+import { authenticate } from '../middlewares/authenticate.js';
 
 const router = Router();
+
+router.use(authenticate);
 
 router.get('/', ctrlWrapper(getAllTasksController));
 
@@ -25,11 +28,7 @@ router.patch(
   ctrlWrapper(updateTaskController),
 );
 
-router.post(
-  '/tasks',
-  validate(createTaskSchema),
-  ctrlWrapper(createTaskController),
-);
+router.post('/', validate(createTaskSchema), ctrlWrapper(createTaskController));
 
 router.delete('/:taskId', validateID, ctrlWrapper(deleteTaskController));
 

@@ -4,6 +4,7 @@ import {
   loginUserController,
   logoutUserController,
   registerUserController,
+  refreshUserController,
 } from '../controllers/authorization.js';
 import {
   loginUserSchema,
@@ -26,5 +27,6 @@ router.post(
 );
 
 router.post('/logout', ctrlWrapper(logoutUserController));
+router.post('/refresh', ctrlWrapper(refreshUserController));
 
 export default router;

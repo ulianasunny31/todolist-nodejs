@@ -8,12 +8,13 @@ export const getAllTasks = async ({
   sortBy = 'title',
   sortOrder = SORT_ORDER.ASC,
   filter = {},
+  userId,
 }) => {
   //pagination logic
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const tasksQuery = TodoTaskCollection.find();
+  const tasksQuery = TodoTaskCollection.find({ userId });
 
   //filtering logic
   if (filter.completed) {
@@ -42,8 +43,8 @@ export const getAllTasks = async ({
   };
 };
 
-export const getTaskById = async (taskId) => {
-  const task = await TodoTaskCollection.findById(taskId);
+export const getTaskById = async (taskId, userId) => {
+  const task = await TodoTaskCollection.findById(taskId, userId);
   return task;
 };
 
@@ -52,15 +53,19 @@ export const createTask = async (taskData) => {
   return newTask;
 };
 
-export const deleteTask = async (taskId) => {
-  const task = await TodoTaskCollection.findOneAndDelete({ _id: taskId });
+export const deleteTask = async (taskId, userId) => {
+  const task = await TodoTaskCollection.findOneAndDelete({
+    _id: taskId,
+    userId,
+  });
   return task;
 };
 
-export const updateTask = async (taskId, payload, options = {}) => {
+export const updateTask = async ({ taskId, userId, payload }, options = {}) => {
   const updatedTask = await TodoTaskCollection.findOneAndUpdate(
     {
       _id: taskId,
+      userId,
     },
     payload,
     { new: true, includeResultMetadata: true, ...options },

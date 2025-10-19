@@ -1,9 +1,20 @@
 import createHttpError from 'http-errors';
 import { UsersCollection } from '../db/models/authorization.js';
 import { SessionCollection } from '../db/models/session.js';
-import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/index.js';
+import {
+  FIFTEEN_MINUTES,
+  ONE_DAY,
+  SMTP,
+  TEMPLATE_DIR,
+} from '../constants/index.js';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
+import handlebars from 'handlebars';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import jwt from 'jsonwebtoken';
+import { getEnvVariables } from '../utils/getEnvVariables.js';
+import { sendEmail } from '../utils/sendEmail.js';
 
 export const registerUser = async (payload) => {
   const user = await UsersCollection.findOne({ email: payload.email });
@@ -56,6 +67,34 @@ export const refreshUser = async ({ sessionId, refreshToken }) => {
   return await SessionCollection.create({
     userId: session.userId,
     ...newSession,
+  });
+};
+
+export const requestResetEmail = async (email) => {
+  const user = await UsersCollection.findOne({ email });
+  if (!user) throw createHttpError(404, 'User not found');
+
+  //reset password token creation
+  const resetToken = jwt.sign(
+    { sub: user._id, email },
+    getEnvVariables('JWT_SECERET'),
+    { expiresIn: '15m' },
+  );
+
+  //email template creation
+  const resetEmailPath = path.join(TEMPLATE_DIR, 'reset-password-email.html');
+  const resetEmailTemplate = (await fs.readFile(resetEmailPath)).toString();
+  const template = handlebars.compile(resetEmailTemplate);
+  const html = template({
+    name: user.username,
+    link: `${getEnvVariables('APP-DOMAIN')}/reset-password?token=${resetToken}`,
+  });
+
+  await sendEmail({
+    from: getEnvVariables(SMTP.SMTP_FROM),
+    to: email,
+    subject: 'Password Reset Request',
+    html,
   });
 };
 

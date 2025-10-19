@@ -5,6 +5,7 @@ import {
   logoutUserController,
   registerUserController,
   refreshUserController,
+  requestResetEmailController,
 } from '../controllers/authorization.js';
 import {
   loginUserSchema,
@@ -27,6 +28,11 @@ router.post(
 );
 
 router.post('/logout', ctrlWrapper(logoutUserController));
+
 router.post('/refresh', ctrlWrapper(refreshUserController));
+
+router.post('/request-reset-email', ctrlWrapper(requestResetEmailController));
+
+// router.post('/reset-password', ctrlWrapper(resetPasswordController));
 
 export default router;
